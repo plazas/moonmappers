@@ -6,6 +6,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 import matplotlib.patches as patches
 import matplotlib.font_manager as fm
 
+
 #"id","name","application_id","priority","sun_angle","minimum_latitude","maximum_latitude","minimum_longitude","maximum_longitude","pixel_resolution","description","details","created_at","updated_at"
 
 pp=PdfPages('regions.pdf')
@@ -28,7 +29,7 @@ max_lat=data['maximum_latitude']
 min_lon=data['minimum_longitude']
 max_lon=data['maximum_longitude']
 details=data['details']
-
+name=data['name']
 
 #matplotlib.patches.Rectangle(xy, width, height, angle=0.0, **kwargs)
 
@@ -39,12 +40,12 @@ cm = plt.get_cmap('gist_rainbow')
 
 colors = plt.cm.Spectral(np.linspace(0,1,NUM_COLORS))
 
-prop = fm.FontProperties(size=7)
+prop = fm.FontProperties(size=5)
 fig= plt.figure()
 ax=fig.add_subplot(111)
 ax.set_color_cycle( [cm(1.*i/NUM_COLORS) for i in range(NUM_COLORS)]  )
 for i, (a,b,c,d, e) in enumerate(zip(min_lon, max_lat, max_lon, min_lat, details)):
-    print a,b,c,d
+    print (a,b,c,d)
     #print (a,b), a+c, b+d
     sun_angle=float(e[11:17])
     ax.add_patch( patches.Rectangle( (a,b), a+c, b+d, fill=False ))
@@ -57,30 +58,32 @@ pp.savefig()
 fig= plt.figure()
 ax=fig.add_subplot(111)
 ax.set_color_cycle( [cm(1.*i/NUM_COLORS) for i in range(NUM_COLORS)]  )
-for i, (a,b,c,d, e) in enumerate(zip(min_lon, max_lat, max_lon, min_lat, details)):
+for i, (a,b,c,d, e, n) in enumerate(zip(min_lon, max_lat, max_lon, min_lat, details, name)):
     if a < 0: continue
+    if not n in ['M119822622LE', 'M109215691RE']: continue
     print (a,b), a+c, b+d
     sun_angle=float(e[11:17])
     ax.add_patch( patches.Rectangle( (a,b), a+c, b+d, fill=False, 
-                                          label='%g'%sun_angle, edgecolor= color_vec[i%len(color_vec)] ))
-    ax.legend(loc='upper right', fancybox=True, ncol=2, numpoints=1, prop = prop)
+                                          label='%s (%g)'%(n,sun_angle), edgecolor= color_vec[i%len(color_vec)] ))
+    ax.legend(loc='upper right', fancybox=True, ncol=4, numpoints=1, prop = prop)
 plt.xlim([0,15])
-plt.ylim([0,100])
+plt.ylim([0,110])
 pp.savefig()
-
+pp.close()
+stop
 
 fig= plt.figure()
 ax=fig.add_subplot(111)
 ax.set_color_cycle( [cm(1.*i/NUM_COLORS) for i in range(NUM_COLORS)]  )
-for i, (a,b,c,d, e) in enumerate(zip(min_lon, max_lat, max_lon, min_lat, details)):
+for i, (a,b,c,d,e,n) in enumerate(zip(min_lon, max_lat, max_lon, min_lat, details, name)):
     if a > 0: continue
     print (a,b), a+c, b+d
     sun_angle=float(e[11:17])
     ax.add_patch( patches.Rectangle( (a,b), a+c, b+d, fill=False, 
-                                          label='%g'%sun_angle, edgecolor= color_vec[i%len(color_vec)] ))
-    ax.legend(loc='upper right', fancybox=True, ncol=2, numpoints=1, prop = prop)
-plt.xlim([-180,-240])
-plt.ylim([-57,-57.2])
+                                          label='%s (%g)'%(n,sun_angle), edgecolor= color_vec[i%len(color_vec)] ))
+    ax.legend(loc='upper right', fancybox=True, ncol=3, numpoints=1, prop = prop)
+plt.xlim([-600,-50])
+plt.ylim([-50,-300])
 pp.savefig()
 
 pp.close()
